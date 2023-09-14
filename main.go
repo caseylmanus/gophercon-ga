@@ -1,13 +1,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"time"
 )
 
+var target string
+
 func main() {
-	target := "Hello Gophercon 2023, Welcome to San Diego!"
+	flag.StringVar(&target, "t", "Hello Gophercon 2023, welcome to San Diego!", "target string to match")
+	flag.Parse()
+
 	fitness := func(genome Genome) float64 {
 		return getFitness(target, genome.Value)
 	}
@@ -33,9 +38,9 @@ func solve(getFitness func(Genome) float64, display func(Genome, int), length in
 		child := bestParent.Mutate(random)
 		child.SetFitness(getFitness)
 		if child.Fitness > bestParent.Fitness {
+			display(child, gen)
 			bestParent = child
 		}
-		display(bestParent, gen)
 	}
 	return bestParent, gen
 }

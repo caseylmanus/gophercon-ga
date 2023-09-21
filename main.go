@@ -8,6 +8,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/caseylmanus/gophercon-ga/queens"
 	"github.com/caseylmanus/gophercon-ga/text"
@@ -17,8 +18,9 @@ func main() {
 	//greeting.Solve()
 	//queens.Solve()
 	myApp := app.New()
+	myApp.Settings().SetTheme(theme.DarkTheme())
 	myWindow := myApp.NewWindow("Gophercon 2023 Demo")
-	valueLabel := widget.NewLabel("")
+	valueLabel := widget.NewLabelWithStyle("", widget.RichTextStyleCodeBlock.Alignment, widget.RichTextStyleCodeBlock.TextStyle)
 	startQueens := widget.NewButton("8 Queens!", func() {
 		valueLabel.SetText("")
 		start := time.Now()

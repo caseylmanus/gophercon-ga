@@ -47,8 +47,8 @@ func main() {
 	//content := widget.NewButtonWithIcon("Home", theme.HomeIcon(), func() {
 	//	log.Println("tapped home")
 	//})
-	myWindow.SetFixedSize(true)
-	myWindow.Resize(fyne.NewSize(1200, 900))
+	//myWindow.SetFixedSize(true)
+	myWindow.Resize(fyne.NewSize(600, 800))
 	myWindow.SetContent(content)
 	myWindow.ShowAndRun()
 

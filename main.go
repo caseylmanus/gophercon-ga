@@ -9,8 +9,8 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
-	"github.com/caseylmanus/gophercon-ga/greeting"
 	"github.com/caseylmanus/gophercon-ga/queens"
+	"github.com/caseylmanus/gophercon-ga/text"
 )
 
 func main() {
@@ -30,9 +30,10 @@ func main() {
 	startGreeting := widget.NewButton("Hello Gophers!", func() {
 		valueLabel.SetText("")
 		start := time.Now()
-		greeting.Solve(func(s string) {
+		target := "Hello Gophercon 2023, Welcome to San Diego!"
+		text.Solve(target, func(s string) {
 			valueLabel.SetText(valueLabel.Text + s)
-		})
+		}, 1)
 		valueLabel.SetText(valueLabel.Text + fmt.Sprintln("Completed in:", time.Since(start)))
 	})
 	buttons := container.New(layout.NewHBoxLayout(), startGreeting, startQueens)

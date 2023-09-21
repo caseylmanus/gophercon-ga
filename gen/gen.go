@@ -1,9 +1,9 @@
 package gen
 
-import "fmt"
+import "context"
 
 type FitnessFunc[T any] func(*Genome[T]) float64
-type PrinterFunc[T any] func(string)
+type ReporterFunc[T any] func(string, int, *Genome[T])
 
 type Species[T any] struct {
 	ValidGenes          []T
@@ -12,7 +12,6 @@ type Species[T any] struct {
 	GenomeSize          int
 	MutationRate        float64
 	SingleCrossOverRate float64
-	Printer             PrinterFunc[T]
 	//other configuration
 }
 
@@ -21,19 +20,23 @@ type Randomizer interface {
 	Float64() float64
 }
 
-func (e *Species[T]) Solve(random Randomizer) {
+func (e *Species[T]) Solve(ctx context.Context, random Randomizer, species string, reporter ReporterFunc[T]) {
 	pop := e.RandomPopulation(random)
 	bestScore := pop.Fittest.Fitness
 	for {
-		pop = e.NextPopulation(random, pop)
-		if pop.Fittest.Fitness == 1 {
-			fmt.Sprintln("Generation:", pop.Generation, "Fitness:", pop.Fittest.Fitness, "Value:", pop.Fittest.Value)
-			//fmt.Println("There were", combinations.Possible(int64(species.GenomeSize), int64(len(species.ValidGenes))).String(), "combinations!")
+		select {
+		case <-ctx.Done():
 			return
-		}
-		if pop.Fittest.Fitness > bestScore {
-			bestScore = pop.Fittest.Fitness
-			fmt.Println("Generation:", pop.Generation, "Fitness:", pop.Fittest.Fitness, "Value:", pop.Fittest.Value)
+		default:
+			pop = e.NextPopulation(random, pop)
+			if pop.Fittest.Fitness == 1 {
+				reporter(species, pop.Generation, pop.Fittest)
+				return
+			}
+			if pop.Fittest.Fitness > bestScore {
+				bestScore = pop.Fittest.Fitness
+				reporter(species, pop.Generation, pop.Fittest)
+			}
 		}
 	}
 }

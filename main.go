@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -16,19 +19,23 @@ func main() {
 	myApp := app.New()
 	myWindow := myApp.NewWindow("Gophercon 2023 Demo")
 	valueLabel := widget.NewLabel("")
-	startQueens := widget.NewButton("Queens!", func() {
+	startQueens := widget.NewButton("8 Queens!", func() {
 		valueLabel.SetText("")
+		start := time.Now()
 		queens.Solve(func(s string) {
 			valueLabel.SetText(valueLabel.Text + s)
 		})
+		valueLabel.SetText(valueLabel.Text + fmt.Sprintln("Completed in: ", time.Since(start)))
 	})
-	startGreeting := widget.NewButton("Greeting!", func() {
+	startGreeting := widget.NewButton("Hello Gophers!", func() {
 		valueLabel.SetText("")
+		start := time.Now()
 		greeting.Solve(func(s string) {
 			valueLabel.SetText(valueLabel.Text + s)
 		})
+		valueLabel.SetText(valueLabel.Text + fmt.Sprintln("Completed in:", time.Since(start)))
 	})
-	buttons := container.New(layout.NewHBoxLayout(), startQueens, startGreeting)
+	buttons := container.New(layout.NewHBoxLayout(), startGreeting, startQueens)
 	//generationLabel := widget.NewLabel("Generation:")
 	//fitnessLabel := widget.NewLabel("Max Fitness:")
 

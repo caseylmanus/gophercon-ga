@@ -14,7 +14,7 @@ func Solve(printUp func(string)) {
 	species := gen.Species[Point]{
 		ValidGenes:          getValidPoints(),
 		GenomeSize:          8,
-		PopulationSize:      5000,
+		PopulationSize:      10000,
 		MutationRate:        0.01,
 		SingleCrossOverRate: .8,
 		Fitness:             fitness,

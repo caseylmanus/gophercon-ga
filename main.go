@@ -21,10 +21,18 @@ func main() {
 	myApp.Settings().SetTheme(theme.DarkTheme())
 	myWindow := myApp.NewWindow("Gophercon 2023 Demo")
 	valueLabel := widget.NewLabelWithStyle("", widget.RichTextStyleCodeBlock.Alignment, widget.RichTextStyleCodeBlock.TextStyle)
-	startQueens := widget.NewButton("8 Queens!", func() {
+	start8Queens := widget.NewButton("8 Queens", func() {
 		valueLabel.SetText("")
 		start := time.Now()
-		queens.Solve(func(s string) {
+		queens.Solve(8, 1, func(s string) {
+			valueLabel.SetText(valueLabel.Text + s)
+		})
+		valueLabel.SetText(valueLabel.Text + fmt.Sprintln("Completed in: ", time.Since(start)))
+	})
+	start16Queens := widget.NewButton("16 Queens (4) species", func() {
+		valueLabel.SetText("")
+		start := time.Now()
+		queens.Solve(16, 4, func(s string) {
 			valueLabel.SetText(valueLabel.Text + s)
 		})
 		valueLabel.SetText(valueLabel.Text + fmt.Sprintln("Completed in: ", time.Since(start)))
@@ -35,19 +43,12 @@ func main() {
 		target := "Hello Gophercon 2023, Welcome to San Diego!"
 		text.Solve(target, func(s string) {
 			valueLabel.SetText(valueLabel.Text + s)
-		}, 1)
+		})
 		valueLabel.SetText(valueLabel.Text + fmt.Sprintln("Completed in:", time.Since(start)))
 	})
-	buttons := container.New(layout.NewHBoxLayout(), startGreeting, startQueens)
-	//generationLabel := widget.NewLabel("Generation:")
-	//fitnessLabel := widget.NewLabel("Max Fitness:")
+	buttons := container.New(layout.NewHBoxLayout(), startGreeting, start8Queens, start16Queens)
 
-	content := container.New(layout.NewVBoxLayout(), buttons, valueLabel) //, generationLabel, fitnessLabel, valueLabel)
-
-	//content := widget.NewButtonWithIcon("Home", theme.HomeIcon(), func() {
-	//	log.Println("tapped home")
-	//})
-	//myWindow.SetFixedSize(true)
+	content := container.New(layout.NewVBoxLayout(), buttons, valueLabel)
 	myWindow.Resize(fyne.NewSize(600, 800))
 	myWindow.SetContent(content)
 	myWindow.ShowAndRun()

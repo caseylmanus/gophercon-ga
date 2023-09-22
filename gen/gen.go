@@ -3,7 +3,13 @@ package gen
 import "context"
 
 type FitnessFunc[T any] func(*Genome[T]) float64
-type ReporterFunc[T any] func(string, int, *Genome[T])
+type ReporterFunc[T any] func(Report[T])
+
+type Report[T any] struct {
+	Generation int
+	Species    int
+	Fittest    *Genome[T]
+}
 
 type Species[T any] struct {
 	ValidGenes          []T
@@ -20,7 +26,7 @@ type Randomizer interface {
 	Float64() float64
 }
 
-func (e *Species[T]) Solve(ctx context.Context, random Randomizer, species string, reporter ReporterFunc[T]) {
+func (e *Species[T]) Solve(ctx context.Context, random Randomizer, speciesNumber int, reporter ReporterFunc[T]) {
 	pop := e.RandomPopulation(random)
 	bestScore := pop.Fittest.Fitness
 	for {
@@ -30,12 +36,12 @@ func (e *Species[T]) Solve(ctx context.Context, random Randomizer, species strin
 		default:
 			pop = e.NextPopulation(random, pop)
 			if pop.Fittest.Fitness == 1 {
-				reporter(species, pop.Generation, pop.Fittest)
+				reporter(Report[T]{Fittest: pop.Fittest, Generation: pop.Generation, Species: speciesNumber})
 				return
 			}
 			if pop.Fittest.Fitness > bestScore {
 				bestScore = pop.Fittest.Fitness
-				reporter(species, pop.Generation, pop.Fittest)
+				reporter(Report[T]{Fittest: pop.Fittest, Generation: pop.Generation, Species: speciesNumber})
 			}
 		}
 	}

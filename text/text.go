@@ -11,7 +11,7 @@ import (
 	"github.com/caseylmanus/gophercon-ga/gen"
 )
 
-func Solve(targetString string, printUp func(string), concurrency int) {
+func Solve(targetString string, printUp func(string)) {
 	target := []rune(targetString)
 	validGenes := validRunes()
 	species := gen.Species[rune]{
@@ -30,14 +30,14 @@ func Solve(targetString string, printUp func(string), concurrency int) {
 			return float64(matches) / float64(len(target))
 		},
 	}
-	reporter := func(s string, i int, g *gen.Genome[rune]) {
-		printUp(fmt.Sprintln("Species: ", s, "Generation:", i, "Fitness:", g.Fitness, "Value:", string(g.Value)))
-		if g.Fitness == 1 {
+	reporter := func(r gen.Report[rune]) {
+		printUp(fmt.Sprintln("Species: ", r.Species, "Generation:", r.Generation, "Fitness:", r.Fittest.Fitness, "Value:", string(r.Fittest.Value)))
+		if r.Fittest.Fitness == 1 {
 			printUp(fmt.Sprintln("There were", combinations.Possible(int64(len(target)), int64(len(validGenes))).String(), "combinations!"))
 		}
 	}
 	random := rand.New(rand.NewSource(time.Now().UnixNano()))
-	species.Solve(context.Background(), random, "1", reporter)
+	species.Solve(context.Background(), random, 1, reporter)
 }
 
 func validRunes() []rune {

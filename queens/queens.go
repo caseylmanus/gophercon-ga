@@ -1,6 +1,7 @@
 package queens
 
 import (
+	"context"
 	"fmt"
 	"math"
 	"math/rand"
@@ -10,28 +11,37 @@ import (
 	"github.com/caseylmanus/gophercon-ga/gen"
 )
 
-func Solve(printUp func(string)) {
+func Solve(boardSize int, concurrency int, printUp func(string)) {
+	reportCh := make(chan gen.Report[Point])
+	reporter := func(r gen.Report[Point]) {
+		reportCh <- r
+	}
+	validGenes := getValidPoints(boardSize)
 	species := gen.Species[Point]{
-		ValidGenes:          getValidPoints(),
-		GenomeSize:          8,
+		ValidGenes:          validGenes,
+		GenomeSize:          boardSize,
 		PopulationSize:      10000,
 		MutationRate:        0.01,
 		SingleCrossOverRate: .8,
 		Fitness:             fitness,
 	}
-	random := rand.New(rand.NewSource(time.Now().UnixNano()))
-	pop := species.RandomPopulation(random)
-	bestScore := pop.Fittest.Fitness
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	for i := 0; i < concurrency; i++ {
+		random := rand.New(rand.NewSource(time.Now().UnixNano()))
+		go species.Solve(ctx, random, i+1, reporter)
+	}
 	for {
-		pop = species.NextPopulation(random, pop)
-		if pop.Fittest.Fitness == 1 {
-			printUp(fmt.Sprintln("Generation:", pop.Generation, "Fitness:", pop.Fittest.Fitness, "Value:", pop.Fittest.Value))
-			printUp(fmt.Sprintln("There were", combinations.Possible(int64(species.GenomeSize), int64(len(species.ValidGenes))).String(), "combinations!"))
+		select {
+		case <-ctx.Done():
 			return
-		}
-		if pop.Fittest.Fitness > bestScore {
-			bestScore = pop.Fittest.Fitness
-			printUp(fmt.Sprintln("Generation:", pop.Generation, "Fitness:", pop.Fittest.Fitness, "Value:", pop.Fittest.Value))
+		case r := <-reportCh:
+			printUp(fmt.Sprintln("Species: ", r.Species, "Generation:", r.Generation, "Fitness:", r.Fittest.Fitness, "Value:", r.Fittest.Value))
+			if r.Fittest.Fitness == 1 {
+				printUp(fmt.Sprintln("There were", combinations.Possible(int64(boardSize), int64(len(validGenes))).String(), "combinations!"))
+				return
+			}
 		}
 	}
 }
@@ -65,10 +75,10 @@ func CanAttack(a, b Point) bool {
 	return answer
 }
 
-func getValidPoints() []Point {
+func getValidPoints(boardSize int) []Point {
 	var points []Point
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
+	for x := 0; x < boardSize; x++ {
+		for y := 0; y < boardSize; y++ {
 			points = append(points, Point{x: x, y: y})
 		}
 	}

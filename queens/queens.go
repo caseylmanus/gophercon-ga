@@ -20,7 +20,7 @@ func Solve(boardSize int, concurrency int, printUp func(string)) {
 	species := gen.Species[Point]{
 		ValidGenes:          validGenes,
 		GenomeSize:          boardSize,
-		PopulationSize:      10000,
+		PopulationSize:      5000,
 		MutationRate:        0.01,
 		SingleCrossOverRate: .8,
 		Fitness:             fitness,

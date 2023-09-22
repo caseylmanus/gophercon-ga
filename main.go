@@ -25,7 +25,7 @@ func main() {
 		valueLabel.SetText("")
 		start := time.Now()
 		queens.Solve(8, 1, func(s string) {
-			valueLabel.SetText(s)
+			valueLabel.SetText(valueLabel.Text() + s)
 		})
 		valueLabel.SetText(valueLabel.Text() + fmt.Sprintln("Completed in: ", time.Since(start)))
 		//valueLabel.Refresh()
